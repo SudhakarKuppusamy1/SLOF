@@ -22,7 +22,8 @@ CPPFLAGS = -I$(LIBCMNDIR)/libbootmsg -I$(LIBCMNDIR)/libhvcall \
 	   -I$(LIBCMNDIR)/libvirtio -I$(LIBCMNDIR)/libnvram \
 	   -I$(LIBCMNDIR)/libusb -I$(LIBCMNDIR)/libveth \
 	   -I$(LIBCMNDIR)/libe1k -I$(LIBCMNDIR)/libnet \
-	   -I$(LIBCMNDIR)/libbootmenu -I$(LIBCMNDIR)/libtpm
+	   -I$(LIBCMNDIR)/libbootmenu -I$(LIBCMNDIR)/libtpm \
+		 -I$(LIBCMNDIR)/libcrypto
 
 SLOF_LIBS = \
 	$(LIBCMNDIR)/libbootmsg.a \
@@ -35,7 +36,8 @@ SLOF_LIBS = \
 	$(LIBCMNDIR)/libe1k.a \
 	$(LIBCMNDIR)/libnet.a \
 	$(LIBCMNDIR)/libbootmenu.a \
-	$(LIBCMNDIR)/libtpm.a
+	$(LIBCMNDIR)/libtpm.a \
+	$(LIBCMNDIR)/libcrypto.a
 
 BOARD_SLOF_IN = \
 	$(LIBCMNDIR)/libhvcall/hvcall.in \

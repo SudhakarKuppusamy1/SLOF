@@ -42,7 +42,8 @@ extern void proceedInterrupt(void);
 void c_interrupt(uint64_t vecNum);
 void set_exceptionVector(int num, void *func);
 void early_c_entry(uint64_t start_addr, uint64_t fdt_addr);
-
+int is_secureboot(void);
+int verify_sbat(void * ptr, size_t s);
 
 static void exception_forward(void)
 {
@@ -202,4 +203,12 @@ void early_c_entry(uint64_t start_addr, uint64_t fdt_addr)
 	ofw_start(fdt_addr, romfs_base, 0, 0x65504150, fdt_addr);
 	asm volatile("isync; sync;" : : : "memory");
 	// never return
+}
+
+int is_secureboot() {
+  return 0;
+}
+
+int verify_sbat(void * ptr, size_t s) {
+  return 1;
 }

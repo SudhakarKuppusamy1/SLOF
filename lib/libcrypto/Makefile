@@ -1,5 +1,5 @@
 # *****************************************************************************
-# * Copyright (c) 2004, 2011 IBM Corporation
+# * Copyright (c) 2015-2020 IBM Corporation
 # * All rights reserved.
 # * This program and the accompanying materials
 # * are made available under the terms of the BSD License
@@ -12,17 +12,18 @@
 
 TOPCMNDIR ?= ../..
 
-include $(TOPCMNDIR)/make.rules
+CPPFLAGS = -I. -I../libc/include $(CPUARCHDEF) -I$(INCLBRDDIR) \
+	   -I$(INCLCMNDIR) -I$(INCLCMNDIR)/$(CPUARCH) -I$(SLOFCMNDIR)
+CPPFLAGS += -I.
 
-CPPFLAGS = -I../libc/include $(CPUARCHDEF) -I$(INCLCMNDIR) -I$(INCLCMNDIR)/$(CPUARCH) \
-           -I$(LIBCMNDIR)/libcrypto
-LDFLAGS= -nostdlib
+LDFLAGS = -nostdlib
 
-TARGET = ../libelf.a
+TARGET = ../libcrypto.a
+
 
 all: $(TARGET)
 
-SRCS = elf.c elf32.c elf64.c elf_claim.c
+SRCS = secure_boot.c sbat_verifier.c
 
 OBJS = $(SRCS:%.c=%.o)
 
@@ -36,13 +37,14 @@ clean:
 distclean: clean
 	$(RM) Makefile.dep
 
+
 # Rules for creating the dependency file:
 depend:
 	$(RM) Makefile.dep
 	$(MAKE) Makefile.dep
 
 Makefile.dep: Makefile
-	$(CC) -MM $(CPPFLAGS) $(CFLAGS) $(SRCS) > Makefile.dep
+	$(CC) -M $(CPPFLAGS) $(CFLAGS) $(SRCS) $(SRCSS) > Makefile.dep
 
 # Include dependency file if available:
 -include Makefile.dep

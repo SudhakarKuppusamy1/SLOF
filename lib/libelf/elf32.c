@@ -18,6 +18,9 @@
 #include <libelf.h>
 #include <byteorder.h>
 #include <helpers.h>
+#include <libcrypto.h>
+
+#define ALIGN(x, a) (((x) + ((a) - 1)) & ~((a) - 1))
 
 struct ehdr32 {
 	uint32_t ei_ident;
@@ -62,6 +65,12 @@ struct shdr32 {
 	uint32_t sh_info;
 	uint32_t sh_addralign;
 	uint32_t sh_entsize;
+};
+
+struct nhdr32 {
+	uint32_t n_namesz;
+	uint32_t n_descsz;
+	uint32_t n_type;
 };
 
 static struct phdr32*
@@ -123,7 +132,20 @@ elf_load_segments32(void *file_addr, signed long offset,
 			/* copy segment */
 			load_segment(file_addr, phdr, offset, pre_load,
 			             post_load);
-		}
+		} else if (phdr->p_type == PT_NOTE) {
+                        struct nhdr32 *nhdr = (struct nhdr32 *)(file_addr + phdr->p_offset);
+                        size_t size;
+			if (is_secureboot()) {
+				/* SBAT ELF NOTE  */
+				if (nhdr->n_type == SBAT_NOTE_TYPE) {
+					size = (phdr->p_offset + sizeof(struct nhdr32) + ALIGN(nhdr->n_namesz, 4));
+					char* sbat_metadata = (char *)(file_addr) + size;
+					if (verify_sbat(sbat_metadata, ALIGN(nhdr->n_descsz, 4)) != 0)
+						return 0;
+				}
+			}
+                }
+
 		/* step to next header */
 		phdr = (struct phdr32 *)(((uint8_t *)phdr) + ehdr->e_phentsize);
 	}
